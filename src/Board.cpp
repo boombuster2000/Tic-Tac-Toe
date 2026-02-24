@@ -28,11 +28,13 @@ void Board::PrintBoard() const
                 break;
             }
 
-            std::cout << "|";
+            [[likely]] if (&square != &row.back())
+                std::cout << "|";
+
         }
 
         [[likely]] if (&row != &m_grid.back())
-            std::cout << "\n-+-+-+-\n";
+            std::cout << "\n-+-+-\n";
         else
             std::cout << "\n";
     }
