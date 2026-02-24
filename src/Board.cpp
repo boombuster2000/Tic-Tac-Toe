@@ -4,9 +4,7 @@
 
 Board::Board(Vector2 dimensions) : m_dimensions(dimensions)
 {
-    m_grid.resize(dimensions.y);
-    for (int y = 0; y < dimensions.y; y++)
-        m_grid[y].resize(dimensions.x);
+    m_grid.resize(dimensions.y, std::vector<Square>(dimensions.x));
 }
 
 void Board::PrintBoard() const
@@ -15,15 +13,16 @@ void Board::PrintBoard() const
     {
         for (const auto& square : row)
         {
+            using enum Square;
             switch (square)
             {
-            case 0:
+            case EMPTY:
                 std::cout << " ";
                 break;
-            case 1:
+            case CIRCLE:
                 std::cout << "O";
                 break;
-            case -1:
+            case CROSS:
                 std::cout << "X";
                 break;
             }

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Vector2.h"
+#include "GameTypes.h"
 
 class Board
 {
@@ -13,5 +13,5 @@ public:
 
 private:
     Vector2 m_dimensions;
-    std::vector<std::vector<int>> m_grid{};
+    std::vector<std::vector<Square>> m_grid{};
 };
