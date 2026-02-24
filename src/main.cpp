@@ -4,6 +4,6 @@
 
 int main()
 {
-  Board board({3,3});
-  board.PrintBoard();
+    Board board({3, 3});
+    board.PrintBoard();
 }
