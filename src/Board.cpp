@@ -2,9 +2,14 @@
 
 #include "Board.h"
 
+Board::Board(int x, int y) : m_dimensions(x,y)
+{
+    InitialiseGrid();
+}
+
 Board::Board(Vector2 dimensions) : m_dimensions(dimensions)
 {
-    m_grid.resize(dimensions.y, std::vector<Square>(dimensions.x));
+    InitialiseGrid();
 }
 
 void Board::PrintBoard() const
@@ -29,7 +34,6 @@ void Board::PrintBoard() const
 
             [[likely]] if (&square != &row.back())
                 std::cout << "|";
-
         }
 
         [[likely]] if (&row != &m_grid.back())
@@ -37,4 +41,14 @@ void Board::PrintBoard() const
         else
             std::cout << "\n\n";
     }
+}
+
+Vector2 Board::GetDimensions() const
+{
+    return m_dimensions;
+}
+
+void Board::InitialiseGrid()
+{
+    m_grid.resize(m_dimensions.y, std::vector<Square>(m_dimensions.x));
 }
