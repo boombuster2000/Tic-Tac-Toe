@@ -35,6 +35,6 @@ void Board::PrintBoard() const
         [[likely]] if (&row != &m_grid.back())
             std::cout << "\n-+-+-\n";
         else
-            std::cout << "\n";
+            std::cout << "\n\n";
     }
 }
