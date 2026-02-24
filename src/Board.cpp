@@ -4,17 +4,9 @@
 
 Board::Board(Vector2 dimensions) : m_dimensions(dimensions)
 {
-    // m_grid.resize(dimensions.y);
-
+    m_grid.resize(dimensions.y);
     for (int y = 0; y < dimensions.y; y++)
-    {
-        std::vector<int> row;
-        // m_grid[y].resize(dimensions.x);
-        for (int x = 0; x < dimensions.x; x++)
-            row.push_back(0);
-
-        m_grid.push_back(row);
-    }
+        m_grid[y].resize(dimensions.x);
 }
 
 void Board::PrintBoard() const
