@@ -31,6 +31,34 @@ void ClearScreen()
 #endif
 }
 
+void MoveCursorUp(int lines)
+{
+#ifdef _WIN32
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    COORD pos = { 0, short(csbi.dwCursorPosition.Y - lines) };
+    SetConsoleCursorPosition(hConsole, pos);
+#else
+    std::cout << "\033[" << lines << "A";
+#endif
+}
+
+void ClearLine()
+{
+#ifdef _WIN32
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    COORD pos = { 0, csbi.dwCursorPosition.Y };
+    DWORD written;
+    FillConsoleOutputCharacter(hConsole, ' ', csbi.dwSize.X, pos, &written);
+    SetConsoleCursorPosition(hConsole, pos);
+#else
+    std::cout << "\033[2K";
+#endif
+}
+
 bool ExtractCoordsFromString(const std::string& text, Vector2& out)
 {
     std::regex coordsPattern(R"(([0-9]+),([0-9]+))");
@@ -56,10 +84,9 @@ Vector2 GetCoordFromUser(int player)
         if (ExtractCoordsFromString(userMove, coords))
             return coords;
 
-        // Escape Code Meanings
-        // "\033[1A" - move cursor up 1 line
-        // "\033[2K" - erase the entire current line
-        std::cout << "\033[1A\033[2K";
+        MoveCursorUp(1);
+        ClearLine();
+
         std::cout << "[P" << player << "] Invalid input. Enter coord (x,y): ";
     }
 }
