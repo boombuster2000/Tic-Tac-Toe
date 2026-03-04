@@ -2,3 +2,7 @@ build/
 
 # Nextcloud ignore list (not needed for github)
 .sync-exclude.lst
+
+.clangd
+compile_commands.json
+.cache/
