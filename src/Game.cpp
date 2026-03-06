@@ -27,9 +27,9 @@ bool Game::ExtractCoordsFromString(const std::string& text, Vector2& out)
     return true;
 }
 
-Vector2 Game::GetValidCoordsFromUser(const int currentPlayer) const
+Vector2 Game::GetValidCoordsFromUser() const
 {
-    const std::string lineHeader = std::format("[P{}]", currentPlayer);
+    const std::string lineHeader = std::format("[P{}]", m_currentPlayer);
     const std::string prompt = "Enter coord (x,y):";
 
     auto RewriteLineWithError = [&](const std::string& reason) {
@@ -70,8 +70,16 @@ Vector2 Game::GetValidCoordsFromUser(const int currentPlayer) const
 
 void Game::Run()
 {
-    m_board.PrintBoard();
-    Vector2 coords = GetValidCoordsFromUser(1);
+    constexpr int maxTurns = 9;
+
+    for (int turnCount = 0; turnCount < maxTurns; ++turnCount)
+    {
+        m_currentPlayer = (turnCount % 2) + 1;
+        ClearScreen();
+        m_board.PrintBoard();
+        Vector2 coords = GetValidCoordsFromUser();
+    }
+
 }
 
 void Game::ClearScreen()

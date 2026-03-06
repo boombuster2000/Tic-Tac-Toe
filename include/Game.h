@@ -19,8 +19,9 @@ private:
     static void RewriteLine(const std::string& newText);
 
     static bool ExtractCoordsFromString(const std::string& text, Vector2& out);
-    Vector2 GetValidCoordsFromUser(int player) const;
+    Vector2 GetValidCoordsFromUser() const;
 
 private:
     Board m_board;
+    int m_currentPlayer;
 };
