@@ -1,13 +1,14 @@
 #include <iostream>
 
 #include "Board.h"
+#include "Vector2.h"
 
-Board::Board(int x, int y) : m_dimensions(x,y)
+Board::Board(const int x, const int y) : m_dimensions(static_cast<float>(x), static_cast<float>(y))
 {
     InitialiseGrid();
 }
 
-Board::Board(Vector2 dimensions) : m_dimensions(dimensions)
+Board::Board(const Vector2 dimensions) : m_dimensions(dimensions)
 {
     InitialiseGrid();
 }
@@ -36,7 +37,7 @@ void Board::PrintBoard() const
                 std::cout << "|";
         }
 
-        [[likely]] if (&row != &m_grid.back())
+        if (&row != &m_grid.back()) [[likely]]
             std::cout << "\n-+-+-\n";
         else
             std::cout << "\n\n";
@@ -46,6 +47,11 @@ void Board::PrintBoard() const
 Vector2 Board::GetDimensions() const
 {
     return m_dimensions;
+}
+
+bool Board::IsInBounds(const Vector2& coords) const
+{
+    return Vector2{0,0} <= coords && coords < m_dimensions;
 }
 
 void Board::InitialiseGrid()
