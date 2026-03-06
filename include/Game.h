@@ -7,7 +7,7 @@
 #include <string>
 
 #include "Board.h"
-#include "GameTypes.h"
+#include "Vector2.h"
 
 class Game
 {
@@ -21,8 +21,10 @@ private:
     static void MoveCursorUp(int lines);
     static void ClearLine();
 
+    bool IsCoordsInRange(const Vector2& coords) const;
     static bool ExtractCoordsFromString(const std::string& text, Vector2& out);
-    Vector2 GetCoordsFromUser(const int player);
+    Vector2 GetValidCoordsFromUser(const int player) const;
+
 private:
     Board m_board;
 };

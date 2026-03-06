@@ -6,8 +6,3 @@ enum class Square : int
     CIRCLE = 1,
     CROSS = -1
 };
-
-struct Vector2
-{
-    int x, y;
-};
