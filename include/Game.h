@@ -21,7 +21,6 @@ private:
     static void MoveCursorUp(int lines);
     static void ClearLine();
 
-    bool IsCoordsInRange(const Vector2& coords) const;
     static bool ExtractCoordsFromString(const std::string& text, Vector2& out);
     Vector2 GetValidCoordsFromUser(const int player) const;
 
