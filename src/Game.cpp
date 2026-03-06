@@ -1,99 +1,107 @@
 #include "Game.h"
+#include "Vector2.h"
 
 #include <iostream>
 #include <regex>
 
-
-Game::Game() : m_board{3,3}
+Game::Game() : m_board{3, 3}
 {
 }
 
 bool Game::ExtractCoordsFromString(const std::string& text, Vector2& out)
 {
-    std::regex coordsPattern(R"(([0-9]+),([0-9]+))");
+    const std::regex coordsPattern(R"(([0-9]+),([0-9]+))");
     std::smatch matches;
 
     if (!std::regex_match(text, matches, coordsPattern))
         return false;
 
-    out.x = std::stoi(matches[1]);
-    out.y = std::stoi(matches[2]);
+    out.x = std::stof(matches[1]);
+    out.y = std::stof(matches[2]);
     return true;
 }
 
-Vector2 Game::GetCoordsFromUser(const int player)
+Vector2 Game::GetValidCoordsFromUser(const int currentPlayer) const
 {
-    std::cout << "[P" << player << "] Enter coord (x,y): ";
-    std::string userMove;
-
+    std::cout << "[P" << currentPlayer << "] Enter coord (x,y): ";
+    std::string userInput;
     while (true)
     {
-        std::cin >> userMove;
-        Vector2 coords;
-
-        if (!ExtractCoordsFromString(userMove, coords))
+        std::getline(std::cin, userInput);
+        Vector2 extractedCoords;
+        if (!ExtractCoordsFromString(userInput, extractedCoords))
         {
             MoveCursorUp(1);
             ClearLine();
-
-            std::cout << "[P" << player << "] Invalid input. Enter coord (x,y): ";
+            std::cout << "[P" << currentPlayer << "] Invalid input. Enter coord (x,y): ";
             continue;
         }
+
+        extractedCoords -=  Vector2{1,1}; // To convert to 0 index system
+        if (!m_board.IsInBounds(extractedCoords))
+        {
+            MoveCursorUp(1);
+            ClearLine();
+            std::cout << "[P" << currentPlayer << "] Coords out of bounds. Enter coord (x,y): ";
+            continue;
+        }
+
+        return extractedCoords;
     }
 }
 
 void Game::Run()
 {
     m_board.PrintBoard();
-    Vector2 coords = GetCoordsFromUser(1);
+    Vector2 coords = GetValidCoordsFromUser(1);
 }
 
 void Game::ClearScreen()
 {
 #if defined(_WIN32) || defined(_WIN64)
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    DWORD count, cellCount;
-    COORD homeCoords = {0, 0};
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screenBufferInfo;
+    DWORD charsWritten;
+    constexpr COORD originCoords = {0, 0};
 
-    if (hConsole == INVALID_HANDLE_VALUE)
+    if (consoleHandle == INVALID_HANDLE_VALUE)
         return;
 
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+    GetConsoleScreenBufferInfo(consoleHandle, &screenBufferInfo);
+    const DWORD totalCells = screenBufferInfo.dwSize.X * screenBufferInfo.dwSize.Y;
 
-    FillConsoleOutputCharacter(hConsole, ' ', cellCount, homeCoords, &count);
-    FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, homeCoords, &count);
-    SetConsoleCursorPosition(hConsole, homeCoords);
+    FillConsoleOutputCharacter(consoleHandle, ' ', totalCells, originCoords, &charsWritten);
+    FillConsoleOutputAttribute(consoleHandle, screenBufferInfo.wAttributes, totalCells, originCoords, &charsWritten);
+    SetConsoleCursorPosition(consoleHandle, originCoords);
 #else
     std::fputs("\033[2J\033[H", stdout);
     std::fflush(stdout);
 #endif
 }
 
-void Game::MoveCursorUp(int lines)
+void Game::MoveCursorUp(int lineCount)
 {
 #ifdef _WIN32
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    COORD pos = {0, short(csbi.dwCursorPosition.Y - lines)};
-    SetConsoleCursorPosition(hConsole, pos);
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screenBufferInfo;
+    GetConsoleScreenBufferInfo(consoleHandle, &screenBufferInfo);
+    const COORD targetPos = {0, static_cast<short>(screenBufferInfo.dwCursorPosition.Y - lineCount)};
+    SetConsoleCursorPosition(consoleHandle, targetPos);
 #else
-    std::cout << "\033[" << lines << "A";
+    std::cout << "\033[" << lineCount << "A";
 #endif
 }
 
 void Game::ClearLine()
 {
 #ifdef _WIN32
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    COORD pos = {0, csbi.dwCursorPosition.Y};
-    DWORD written;
-    FillConsoleOutputCharacter(hConsole, ' ', csbi.dwSize.X, pos, &written);
-    SetConsoleCursorPosition(hConsole, pos);
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screenBufferInfo;
+    GetConsoleScreenBufferInfo(consoleHandle, &screenBufferInfo);
+    const COORD lineStartPos = {0, screenBufferInfo.dwCursorPosition.Y};
+    DWORD charsWritten;
+    FillConsoleOutputCharacter(consoleHandle, ' ', screenBufferInfo.dwSize.X, lineStartPos, &charsWritten);
+    SetConsoleCursorPosition(consoleHandle, lineStartPos);
 #else
     std::cout << "\033[2K";
 #endif
