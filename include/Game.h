@@ -1,9 +1,5 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
-#endif
-
 #include <string>
 
 #include "Board.h"
@@ -22,7 +18,7 @@ private:
     static void ClearLine();
 
     static bool ExtractCoordsFromString(const std::string& text, Vector2& out);
-    Vector2 GetValidCoordsFromUser(const int player) const;
+    Vector2 GetValidCoordsFromUser(int player) const;
 
 private:
     Board m_board;

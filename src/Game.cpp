@@ -1,8 +1,13 @@
 #include "Game.h"
-#include "Vector2.h"
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
 
 #include <iostream>
 #include <regex>
+
+#include "Vector2.h"
 
 Game::Game() : m_board{3, 3}
 {
