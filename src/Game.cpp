@@ -4,6 +4,7 @@
 #include <windows.h>
 #endif
 
+#include <format>
 #include <iostream>
 #include <regex>
 
@@ -28,26 +29,38 @@ bool Game::ExtractCoordsFromString(const std::string& text, Vector2& out)
 
 Vector2 Game::GetValidCoordsFromUser(const int currentPlayer) const
 {
-    std::cout << "[P" << currentPlayer << "] Enter coord (x,y): ";
+    const std::string lineHeader = std::format("[P{}]", currentPlayer);
+    const std::string prompt = "Enter coord (x,y):";
+
+    auto RewriteLineWithError = [&](const std::string& reason) {
+        RewriteLine(std::format("{} {}. {} ", lineHeader, reason, prompt));
+    };
+
+    std::cout << std::format("{} {} ", lineHeader, prompt);
     std::string userInput;
+
     while (true)
     {
         std::getline(std::cin, userInput);
         Vector2 extractedCoords;
+
         if (!ExtractCoordsFromString(userInput, extractedCoords))
         {
-            MoveCursorUp(1);
-            ClearLine();
-            std::cout << "[P" << currentPlayer << "] Invalid input. Enter coord (x,y): ";
+            RewriteLineWithError("Invalid input");
             continue;
         }
 
-        extractedCoords -=  Vector2{1,1}; // To convert to 0 index system
+        extractedCoords -= Vector2{1, 1}; // To convert to 0 based index system
+
         if (!m_board.IsInBounds(extractedCoords))
         {
-            MoveCursorUp(1);
-            ClearLine();
-            std::cout << "[P" << currentPlayer << "] Coords out of bounds. Enter coord (x,y): ";
+            RewriteLineWithError("Coords out of bounds");
+            continue;
+        }
+
+        if (m_board.IsSpaceTaken(extractedCoords))
+        {
+            RewriteLineWithError("Space taken");
             continue;
         }
 
@@ -110,4 +123,11 @@ void Game::ClearLine()
 #else
     std::cout << "\033[2K";
 #endif
+}
+
+void Game::RewriteLine(const std::string& newText)
+{
+    MoveCursorUp(1);
+    ClearLine();
+    std::cout << newText;
 }
