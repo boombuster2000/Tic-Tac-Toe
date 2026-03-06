@@ -19,7 +19,7 @@ void Board::PrintBoard() const
     {
         for (const auto& square : row)
         {
-            using enum Square;
+            using enum CellState;
             switch (square)
             {
             case EMPTY:
@@ -54,7 +54,12 @@ bool Board::IsInBounds(const Vector2& coords) const
     return Vector2{0,0} <= coords && coords < m_dimensions;
 }
 
+bool Board::IsSpaceTaken(const Vector2& coords) const
+{
+    return m_grid[coords.y][coords.x] != CellState::EMPTY;
+}
+
 void Board::InitialiseGrid()
 {
-    m_grid.resize(m_dimensions.y, std::vector<Square>(m_dimensions.x));
+    m_grid.resize(m_dimensions.y, std::vector<CellState>(m_dimensions.x));
 }

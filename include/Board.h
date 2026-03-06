@@ -15,11 +15,12 @@ public:
     [[nodiscard]] Vector2 GetDimensions() const;
 
     [[nodiscard]] bool IsInBounds(const Vector2& coords) const;
+    [[nodiscard]] bool IsSpaceTaken(const Vector2& coords) const;
 
 private:
     void InitialiseGrid();
 
 private:
     Vector2 m_dimensions;
-    std::vector<std::vector<Square>> m_grid{};
+    std::vector<std::vector<CellState>> m_grid{};
 };

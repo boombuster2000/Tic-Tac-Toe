@@ -1,6 +1,6 @@
 #pragma once
 
-enum class Square : int
+enum class CellState : int
 {
     EMPTY = 0,
     CIRCLE = 1,
